@@ -1,4 +1,4 @@
-import { decrypt, encrypt } from "./util";
+import { decrypt, encrypt, hash } from "./util";
 
 describe("crypto utils", () => {
   it("encryption followed by decryption results in same message", () => {
@@ -30,5 +30,9 @@ describe("crypto utils", () => {
       const encryptedMessage = encrypt({ message, key });
       expect(decrypt({ encryptedMessage, key: "some other key" })).toBe("");
     });
+  });
+
+  it("same key same hash", () => {
+    expect(hash({ str: "some key" })).toBe(hash({ str: "some key" }));
   });
 });

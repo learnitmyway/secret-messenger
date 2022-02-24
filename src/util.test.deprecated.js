@@ -1,4 +1,4 @@
-import { decrypt, encrypt, hash } from "./util";
+import { decrypt, encrypt, hash } from "./util.deprecated";
 
 describe("crypto utils", () => {
   it("encryption followed by decryption results in same message", () => {

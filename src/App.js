@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { decrypt, encrypt, hash } from "./util";
+import { decrypt, encrypt, hash } from "./util.deprecated";
 
 import "./App.css";
 

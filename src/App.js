@@ -1,19 +1,44 @@
-import { useState } from "react";
-import { decrypt, encrypt, hash } from "./util.deprecated";
+import { useEffect, useState } from "react";
 
 import "./App.css";
+import { generateNewPair, encrypt, decrypt } from "./util";
 
 function App() {
+  const passphrase = "super long and hard to guess secret";
   const [secretMessageVal, setSecretMessageVal] = useState("");
-  const key = "some key";
-  const hashedKey = hash({ str: key });
+  const [publicKeyArmored, setPublicKeyArmored] = useState("");
+  const [privateKeyArmored, setPrivateKeyArmored] = useState("");
+  const [encrypted, setEncrypted] = useState("");
+  const [decrypted, setDecrypted] = useState("");
 
-  const encrypted = encrypt({ message: secretMessageVal, key });
-  const decrypted = decrypt({ encryptedMessage: encrypted, key });
-  const decryptedWithWrongKey = decrypt({
-    encryptedMessage: encrypted,
-    key: "wrong-key",
-  });
+  useEffect(() => {
+    async function generateNewPairWrapper() {
+      const { publicKeyArmored, privateKeyArmored } = await generateNewPair({
+        passphrase,
+      });
+      setPrivateKeyArmored(privateKeyArmored);
+      setPublicKeyArmored(publicKeyArmored);
+    }
+    generateNewPairWrapper();
+  }, []);
+
+  useEffect(() => {
+    async function all({ text }) {
+      const encrypted = await encrypt({
+        text,
+        publicKeyArmored,
+      });
+      setEncrypted(encrypted);
+      const decrypted = await decrypt({
+        privateKeyArmored,
+        passphrase,
+        encrypted,
+      });
+      setDecrypted(decrypted);
+    }
+    all({ text: secretMessageVal });
+  }, [secretMessageVal, privateKeyArmored, publicKeyArmored]);
+
   return (
     <main className="App">
       <label htmlFor="secret-message-input">Secret Message: </label>
@@ -22,12 +47,9 @@ function App() {
         onChange={(e) => setSecretMessageVal(e.target.value)}
         value={secretMessageVal}
       />
-      <div>key: {key}</div>
-      <div>hashedKey: {hashedKey}</div>
       <div>value: {secretMessageVal}</div>
       <div>encrypted: {encrypted}</div>
       <div>decrypted: {decrypted}</div>
-      <div>decrypted with wrong key: {decryptedWithWrongKey}</div>
     </main>
   );
 }
